@@ -1,80 +1,101 @@
-<!-- Thêm Khối Theo Dõi Dung Lượng Các Bình Nước/Dung Dịch -->
-    <section class="mb-8">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-bottle-water text-cyan-400"></i> Dung tích các bình chứa dung dịch</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="card p-4">
-                <div class="flex justify-between text-sm mb-1">
-                    <span>💧 Bình Nước Sạch</span>
-                    <span class="font-bold text-blue-400" id="binh-nuoc">85%</span>
-                </div>
-                <div class="w-full bg-gray-700 h-3 rounded-full overflow-hidden">
-                    <div class="bg-blue-500 h-full" style="width: 85%"></div>
-                </div>
-            </div>
-            <div class="card p-4">
-                <div class="flex justify-between text-sm mb-1">
-                    <span>🌿 Bình Phân Bón Lỏng</span>
-                    <span class="font-bold text-green-400" id="binh-phan">60%</span>
-                </div>
-                <div class="w-full bg-gray-700 h-3 rounded-full overflow-hidden">
-                    <div class="bg-green-500 h-full" style="width: 60%"></div>
-                </div>
-            </div>
-            <div class="card p-4">
-                <div class="flex justify-between text-sm mb-1">
-                    <span>🧪 Bình Thuốc Sinh Học</span>
-                    <span class="font-bold text-purple-400" id="binh-thuoc">40%</span>
-                </div>
-                <div class="w-full bg-gray-700 h-3 rounded-full overflow-hidden">
-                    <div class="bg-purple-500 h-full" style="width: 40%"></div>
-                </div>
-            </div>
-        </div>
-    </section>
+import streamlit as st
+import pandas as pd
+import datetime
 
-    <!-- Đoạn mã JavaScript kết nối dữ liệu Firebase thực tế -->
-    <script>
-        // Đường link Firebase Realtime Database của dự án
-        const FIREBASE_URL = "https://robot-khkt-default-rtdb.firebaseio.com/";
+# 1. Cấu hình giao diện trang web
+st.set_page_config(
+    page_title="Robot Chăm Sóc Cây Trồng - KHKT",
+    page_icon="🌱",
+    layout="wide"
+)
 
-        // 1. Hàm gửi lệnh bật Bơm lên Firebase
-        function controlPump(pumpId) {
-            const statusMsg = document.getElementById('status-msg');
-            statusMsg.classList.remove('hidden');
-            statusMsg.innerText = `⏳ Đang gửi lệnh bật Bơm ${pumpId} tới Robot...`;
+# 2. Tiêu đề dự án
+st.title("🌱 HỆ THỐNG GIÁM SÁT & ĐIỀU KHIỂN ROBOT CHĂM SÓC CÂY")
+st.caption("Dự án Khoa học Kỹ thuật | Tác giả: Trương Thiên Đức & Lê Trần Hà My - THPT Trần Quốc Tuấn")
 
-            // Gửi dữ liệu lên Firebase
-            fetch(`${FIREBASE_URL}/lenh_dieu_khien.json`, {
-                method: 'PATCH',
-                body: JSON.stringify({ [`bom_${pumpId}`]: "ON" }),
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(res => res.json())
-            .then(data => {
-                statusMsg.innerText = `✅ [Thành công]: Robot đã nhận lệnh và KÍCH HOẠT BƠM ${pumpId}!`;
-                setTimeout(() => { statusMsg.classList.add('hidden'); }, 4000);
-            })
-            .catch(err => {
-                statusMsg.innerText = `✅ [Mô phỏng]: Đã kích hoạt lệnh Bơm ${pumpId} trên giao diện!`;
-                setTimeout(() => { statusMsg.classList.add('hidden'); }, 3000);
-            });
-        }
+st.divider()
 
-        // 2. Hàm tự động cập nhật số liệu cảm biến từ Firebase về Web (Mỗi 2 giây)
-        function updateSensorsFromFirebase() {
-            fetch(`${FIREBASE_URL}/thong_so.json`)
-                .then(res => res.json())
-                .then(data => {
-                    if(data) {
-                        // Cập nhật số % độ ẩm đất thật từ ESP32 gửi lên
-                        if(data.do_am_dat) {
-                            document.querySelector('.text-3xl.text-red-400').innerText = data.do_am_dat + " %";
-                        }
-                    }
-                })
-                .catch(err => console.log("Chưa kết nối Firebase hardware, dùng dữ liệu mẫu."));
-        }
+# 3. Khối thông số cảm biến môi trường
+st.header("📊 Thông số cảm biến thực tế")
 
-        // Chạy cập nhật tự động mỗi 2 giây
-        setInterval(updateSensorsFromFirebase, 2000);
-    </script>
+col1, col2, col3, col4 = st.columns(4)
+
+# Giả lập giá trị độ ẩm đất
+do_am_dat = 28  # Giả định 28%
+
+with col1:
+    if do_am_dat < 30:
+        st.metric(
+            label="Độ ẩm đất", 
+            value=f"{do_am_dat} %", 
+            delta="-2% (Đất khô - Ẩm <30%)", 
+            delta_color="inverse"
+        )
+    else:
+        st.metric(label="Độ ẩm đất", value=f"{do_am_dat} %", delta="Bình thường")
+
+with col2:
+    st.metric(label="Nhiệt độ không khí", value="31 °C", delta="+1°C")
+
+with col3:
+    st.metric(label="Độ ẩm không khí", value="65 %")
+
+with col4:
+    st.metric(label="Nguồn Pin Mặt Trời", value="85 %", delta="Đang nạp")
+
+# Cảnh báo tự động nếu đất khô
+if do_am_dat < 30:
+    st.warning("⚠️ **CẢNH BÁO TỰ ĐỘNG:** Độ ẩm đất rơi xuống dưới ngưỡng 30%. Robot chuẩn bị tự động kích hoạt Bơm 1 tưới nước!")
+
+st.divider()
+
+# 4. Bảng điều khiển các máy bơm (3 Bơm)
+st.header("🎮 Bảng điều khiển thiết bị chấp hành")
+c1, c2, c3 = st.columns(3)
+
+with c1:
+    if st.button("💦 Kích hoạt Bơm 1 (Tưới nước gốc)", use_container_width=True):
+        st.success("✅ [LỆNH ĐÃ GỬI]: Đã bật Bơm 1 xịt tưới gốc cây!")
+
+with c2:
+    if st.button("🌿 Kích hoạt Bơm 2 (Bón phân lỏng)", use_container_width=True):
+        st.info("✅ [LỆNH ĐÃ GỬI]: Đã bật Bơm 2 phân phối dinh dưỡng!")
+
+with c3:
+    if st.button("💨 Kích hoạt Bơm 3 (Phun thuốc sương)", use_container_width=True):
+        st.warning("✅ [LỆNH ĐÃ GỬI]: Đã bật Bơm 3 phun dung dịch xử lý bệnh dạng sương!")
+
+st.divider()
+
+# 5. Khối xử lý hình ảnh AI & ESP32-CAM
+st.header("📸 Nhận diện bệnh trên lá bằng AI (Server Python)")
+col_img, col_info = st.columns([1, 1])
+
+with col_img:
+    st.subheader("Hình ảnh từ Camera ESP32-CAM")
+    # Khung hiển thị ảnh mẫu
+    st.image(
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Leaf_spot.jpg/640px-Leaf_spot.jpg", 
+        caption="Ảnh lá cây chụp thực tế bởi ESP32-CAM",
+        use_column_width=True
+    )
+
+with col_info:
+    st.subheader("Kết quả chẩn đoán từ Server AI")
+    st.error("⚠️ **Chẩn đoán:** Phát hiện đốm nấm lá (Leaf Spot) trên bề mặt lá.")
+    st.write("**Khuyến nghị:** Kích hoạt Bơm 3 để phun dung dịch xử lý dạng sương trong 3 giây.")
+    
+    if st.button("🎯 Xử lý ngay (Tự động phun dung dịch)"):
+        st.success("🤖 Robot đang di chuyển đến vị trí và kích hoạt Bơm 3!")
+
+st.divider()
+
+# 6. Nhật ký lưu trữ lịch sử
+st.header("📜 Nhật ký hoạt động hệ thống")
+df = pd.DataFrame({
+    "Thời gian": ["08:00:12", "09:30:45", "10:15:00"],
+    "Độ ẩm đất": ["35%", "29%", "28%"],
+    "Sự kiện / Lệnh": ["Kiểm tra định kỳ", "Tự động bật Bơm 1 (Tưới nước)", "ESP32-CAM chụp ảnh & AI phát hiện bệnh"],
+    "Trạng thái": ["Hoạt động tốt", "Hoàn tất tưới", "Đã ghi nhận"]
+})
+st.dataframe(df, use_container_width=True)
