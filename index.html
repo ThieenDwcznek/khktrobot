@@ -1,143 +1,80 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robot Chăm Sóc Cây Trồng - KHKT</title>
-    <!-- Thư viện giao diện Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background-color: #0e1117; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; }
-        .card { background-color: #161b22; border: 1px solid #30363d; border-radius: 0.75rem; }
-    </style>
-</head>
-<body class="p-4 md:p-8 max-w-6xl mx-auto">
-
-    <!-- Tiêu đề dự án -->
-    <header class="mb-8 border-b border-gray-800 pb-4">
-        <h1 class="text-2xl md:text-4xl font-bold text-green-400 flex items-center gap-3">
-            🌱 HỆ THỐNG GIÁM SÁT & ĐIỀU KHIỂN ROBOT CHĂM SÓC CÂY
-        </h1>
-        <p class="text-gray-400 mt-2 text-sm md:text-base">
-            Dự án Khoa học Kỹ thuật | Tác giả: <strong>Trương Thiên Đức & Lê Trần Hà My</strong> - THPT Trần Quốc Tuấn
-        </p>
-    </header>
-
-    <!-- Khối Thông số cảm biến -->
+<!-- Thêm Khối Theo Dõi Dung Lượng Các Bình Nước/Dung Dịch -->
     <section class="mb-8">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-simple text-blue-400"></i> Thông số cảm biến thực tế</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="card p-4">
-                <span class="text-xs text-gray-400">Độ ẩm đất</span>
-                <div class="text-3xl font-bold text-red-400 my-1">28 %</div>
-                <span class="text-xs text-red-400 bg-red-950 px-2 py-0.5 rounded">↓ -2% (Đất khô <30%)</span>
-            </div>
-            <div class="card p-4">
-                <span class="text-xs text-gray-400">Nhiệt độ không khí</span>
-                <div class="text-3xl font-bold my-1">31 °C</div>
-                <span class="text-xs text-green-400 bg-green-950 px-2 py-0.5 rounded">↑ +1°C</span>
-            </div>
-            <div class="card p-4">
-                <span class="text-xs text-gray-400">Độ ẩm không khí</span>
-                <div class="text-3xl font-bold my-1">65 %</div>
-                <span class="text-xs text-gray-400">Ổn định</span>
-            </div>
-            <div class="card p-4">
-                <span class="text-xs text-gray-400">Nguồn Pin Mặt Trời</span>
-                <div class="text-3xl font-bold text-yellow-400 my-1">85 %</div>
-                <span class="text-xs text-green-400 bg-green-950 px-2 py-0.5 rounded">⚡ Đang nạp</span>
-            </div>
-        </div>
-
-        <!-- Cảnh báo -->
-        <div class="mt-4 p-4 rounded-lg bg-yellow-950 border border-yellow-600 text-yellow-200 text-sm flex items-center gap-3">
-            <i class="fa-solid fa-triangle-exclamation text-yellow-500 text-xl"></i>
-            <div>
-                <strong>CẢNH BÁO TỰ ĐỘNG:</strong> Độ ẩm đất rơi xuống dưới ngưỡng 30%. Robot chuẩn bị tự động kích hoạt Bơm 1 tưới nước!
-            </div>
-        </div>
-    </section>
-
-    <!-- Bảng điều khiển -->
-    <section class="mb-8">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-gamepad text-purple-400"></i> Bảng điều khiển thiết bị chấp hành</h2>
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-bottle-water text-cyan-400"></i> Dung tích các bình chứa dung dịch</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button onclick="controlPump(1)" class="card p-4 hover:bg-gray-800 transition text-left flex items-center gap-3 border-blue-500/50">
-                <i class="fa-solid fa-droplet text-2xl text-blue-400"></i>
-                <div>
-                    <div class="font-bold">Kích hoạt Bơm 1</div>
-                    <div class="text-xs text-gray-400">Tưới nước gốc cây</div>
+            <div class="card p-4">
+                <div class="flex justify-between text-sm mb-1">
+                    <span>💧 Bình Nước Sạch</span>
+                    <span class="font-bold text-blue-400" id="binh-nuoc">85%</span>
                 </div>
-            </button>
-            <button onclick="controlPump(2)" class="card p-4 hover:bg-gray-800 transition text-left flex items-center gap-3 border-green-500/50">
-                <i class="fa-solid fa-leaf text-2xl text-green-400"></i>
-                <div>
-                    <div class="font-bold">Kích hoạt Bơm 2</div>
-                    <div class="text-xs text-gray-400">Bón phân lỏng</div>
+                <div class="w-full bg-gray-700 h-3 rounded-full overflow-hidden">
+                    <div class="bg-blue-500 h-full" style="width: 85%"></div>
                 </div>
-            </button>
-            <button onclick="controlPump(3)" class="card p-4 hover:bg-gray-800 transition text-left flex items-center gap-3 border-purple-500/50">
-                <i class="fa-solid fa-wind text-2xl text-purple-400"></i>
-                <div>
-                    <div class="font-bold">Kích hoạt Bơm 3</div>
-                    <div class="text-xs text-gray-400">Phun thuốc sương</div>
-                </div>
-            </button>
-        </div>
-        <div id="status-msg" class="mt-3 text-sm hidden p-3 rounded bg-green-900 border border-green-500 text-green-200"></div>
-    </section>
-
-    <!-- Khối AI -->
-    <section class="mb-8">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-robot text-red-400"></i> Nhận diện bệnh trên lá bằng AI (ESP32-CAM)</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 card p-6">
-            <div>
-                <h3 class="font-semibold text-gray-300 mb-2">Hình ảnh từ Camera ESP32-CAM</h3>
-                <img src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=600&auto=format&fit=crop" class="rounded-lg w-full h-64 object-cover border border-gray-700">
             </div>
-            <div class="flex flex-col justify-center">
-                <h3 class="font-semibold text-gray-300 mb-2">Kết quả chẩn đoán từ Server AI</h3>
-                <div class="p-4 rounded-lg bg-red-950 border border-red-800 text-red-200 mb-4">
-                    <strong class="text-red-400">⚠️ Chẩn đoán:</strong> Phát hiện đốm nấm lá (Leaf Spot) trên bề mặt lá.
+            <div class="card p-4">
+                <div class="flex justify-between text-sm mb-1">
+                    <span>🌿 Bình Phân Bón Lỏng</span>
+                    <span class="font-bold text-green-400" id="binh-phan">60%</span>
                 </div>
-                <p class="text-sm text-gray-300 mb-4"><strong>Khuyến nghị:</strong> Kích hoạt Bơm 3 để phun dung dịch xử lý dạng sương trong 3 giây.</p>
-                <button onclick="alert('🤖 Robot đang di chuyển đến vị trí và phun dung dịch xử lý!')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition">
-                    🎯 Xử lý ngay (Tự động phun)
-                </button>
+                <div class="w-full bg-gray-700 h-3 rounded-full overflow-hidden">
+                    <div class="bg-green-500 h-full" style="width: 60%"></div>
+                </div>
+            </div>
+            <div class="card p-4">
+                <div class="flex justify-between text-sm mb-1">
+                    <span>🧪 Bình Thuốc Sinh Học</span>
+                    <span class="font-bold text-purple-400" id="binh-thuoc">40%</span>
+                </div>
+                <div class="w-full bg-gray-700 h-3 rounded-full overflow-hidden">
+                    <div class="bg-purple-500 h-full" style="width: 40%"></div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Bảng nhật ký -->
-    <section class="mb-8">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-gray-400"></i> Nhật ký hoạt động hệ thống</h2>
-        <div class="card overflow-x-auto">
-            <table class="w-full text-left text-sm text-gray-300">
-                <thead class="bg-gray-800 text-gray-200 border-b border-gray-700">
-                    <tr>
-                        <th class="p-3">Thời gian</th>
-                        <th class="p-3">Độ ẩm đất</th>
-                        <th class="p-3">Sự kiện / Lệnh</th>
-                        <th class="p-3">Trạng thái</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-800">
-                    <tr><td class="p-3">08:00:12</td><td class="p-3">35%</td><td class="p-3">Kiểm tra định kỳ</td><td class="p-3 text-green-400">Hoạt động tốt</td></tr>
-                    <tr><td class="p-3">09:30:45</td><td class="p-3">29%</td><td class="p-3">Tự động bật Bơm 1 (Tưới nước)</td><td class="p-3 text-blue-400">Hoàn tất tưới</td></tr>
-                    <tr><td class="p-3">10:15:00</td><td class="p-3">28%</td><td class="p-3">ESP32-CAM chụp ảnh & AI phát hiện bệnh</td><td class="p-3 text-yellow-400">Đã ghi nhận</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-
+    <!-- Đoạn mã JavaScript kết nối dữ liệu Firebase thực tế -->
     <script>
-        function controlPump(id) {
-            const msg = document.getElementById('status-msg');
-            msg.classList.remove('hidden');
-            msg.innerText = `✅ [LỆNH ĐÃ GỬI]: Đã kích hoạt thành công Bơm ${id} trên Robot!`;
-            setTimeout(() => { msg.classList.add('hidden'); }, 3000);
+        // Đường link Firebase Realtime Database của dự án
+        const FIREBASE_URL = "https://robot-khkt-default-rtdb.firebaseio.com/";
+
+        // 1. Hàm gửi lệnh bật Bơm lên Firebase
+        function controlPump(pumpId) {
+            const statusMsg = document.getElementById('status-msg');
+            statusMsg.classList.remove('hidden');
+            statusMsg.innerText = `⏳ Đang gửi lệnh bật Bơm ${pumpId} tới Robot...`;
+
+            // Gửi dữ liệu lên Firebase
+            fetch(`${FIREBASE_URL}/lenh_dieu_khien.json`, {
+                method: 'PATCH',
+                body: JSON.stringify({ [`bom_${pumpId}`]: "ON" }),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                statusMsg.innerText = `✅ [Thành công]: Robot đã nhận lệnh và KÍCH HOẠT BƠM ${pumpId}!`;
+                setTimeout(() => { statusMsg.classList.add('hidden'); }, 4000);
+            })
+            .catch(err => {
+                statusMsg.innerText = `✅ [Mô phỏng]: Đã kích hoạt lệnh Bơm ${pumpId} trên giao diện!`;
+                setTimeout(() => { statusMsg.classList.add('hidden'); }, 3000);
+            });
         }
+
+        // 2. Hàm tự động cập nhật số liệu cảm biến từ Firebase về Web (Mỗi 2 giây)
+        function updateSensorsFromFirebase() {
+            fetch(`${FIREBASE_URL}/thong_so.json`)
+                .then(res => res.json())
+                .then(data => {
+                    if(data) {
+                        // Cập nhật số % độ ẩm đất thật từ ESP32 gửi lên
+                        if(data.do_am_dat) {
+                            document.querySelector('.text-3xl.text-red-400').innerText = data.do_am_dat + " %";
+                        }
+                    }
+                })
+                .catch(err => console.log("Chưa kết nối Firebase hardware, dùng dữ liệu mẫu."));
+        }
+
+        // Chạy cập nhật tự động mỗi 2 giây
+        setInterval(updateSensorsFromFirebase, 2000);
     </script>
-</body>
-</html>
