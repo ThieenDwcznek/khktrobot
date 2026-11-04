@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
+import datetime
 
-# 1. Cấu hình giao diện trang web (Phải luôn đặt ở đầu tiên)
+# 1. Cấu hình giao diện trang web
 st.set_page_config(
     page_title="Robot Chăm Sóc Cây Trồng - KHKT",
     page_icon="🌱",
@@ -19,6 +20,7 @@ st.header("📊 Thông số cảm biến thực tế")
 
 col1, col2, col3, col4 = st.columns(4)
 
+# Giả lập giá trị độ ẩm đất
 do_am_dat = 28  # Giả định 28%
 
 with col1:
@@ -41,6 +43,7 @@ with col3:
 with col4:
     st.metric(label="Nguồn Pin Mặt Trời", value="85 %", delta="Đang nạp")
 
+# Cảnh báo tự động nếu đất khô
 if do_am_dat < 30:
     st.warning("⚠️ **CẢNH BÁO TỰ ĐỘNG:** Độ ẩm đất rơi xuống dưới ngưỡng 30%. Robot chuẩn bị tự động kích hoạt Bơm 1 tưới nước!")
 
@@ -70,11 +73,11 @@ col_img, col_info = st.columns([1, 1])
 
 with col_img:
     st.subheader("Hình ảnh từ Camera ESP32-CAM")
-    # Sử dụng nguồn ảnh Unsplash chuẩn, load mượt 100% không bị chặn
+    # Khung hiển thị ảnh mẫu
     st.image(
-        "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=600&auto=format&fit=crop", 
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Leaf_spot.jpg/640px-Leaf_spot.jpg", 
         caption="Ảnh lá cây chụp thực tế bởi ESP32-CAM",
-        use_container_width=True
+        use_column_width=True
     )
 
 with col_info:
@@ -82,7 +85,7 @@ with col_info:
     st.error("⚠️ **Chẩn đoán:** Phát hiện đốm nấm lá (Leaf Spot) trên bề mặt lá.")
     st.write("**Khuyến nghị:** Kích hoạt Bơm 3 để phun dung dịch xử lý dạng sương trong 3 giây.")
     
-    if st.button("🎯 Xử lý ngay (Tự động phun dung dịch)", use_container_width=True):
+    if st.button("🎯 Xử lý ngay (Tự động phun dung dịch)"):
         st.success("🤖 Robot đang di chuyển đến vị trí và kích hoạt Bơm 3!")
 
 st.divider()
